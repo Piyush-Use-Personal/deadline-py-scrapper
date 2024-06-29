@@ -18,10 +18,9 @@ class ProcessedContent(BaseModel):
 async def read_root():
     return {"message": "Welcome to the FastAPI application"}
 
-@app.post("/deadline", response_model=list[ProcessedContent])
-async def process_website(request: URLRequest):
+@app.get("/deadline", response_model=list[ProcessedContent])
+async def process_website(url: str):
     try:
-        url = request.url
         results = web_processor.process(url)
         csv_data = CSVHandler.download(results)
         return Response(content=csv_data, media_type="text/csv", headers={"Content-Disposition": "attachment; filename=processed_data.csv"})
