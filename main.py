@@ -1,32 +1,33 @@
 from fastapi import FastAPI, HTTPException, Response
-from web_processor import WebProcessor
+from typing import Optional, List
 from pydantic import BaseModel
-from csv_handler import CSVHandler
+from src.engine.engine import Engine
 
 app = FastAPI()
-web_processor = WebProcessor()
+engine = Engine()
 
-class URLRequest(BaseModel):
-    url: str
 
 class ProcessedContent(BaseModel):
-    title: str
-    content: list
-    author: str
+    title: Optional[str] = None
+    content: Optional[List[str]] = None
+    categories: Optional[List[str]] = None
+    author: Optional[str] = None
+    date: Optional[str] = None
+    link: Optional[str] = None
+
 
 @app.get("/")
 async def read_root():
-    return {"message": "Welcome to the FastAPI application"}
+    return {"message": "Welcome to the Screen Dollar application"}
 
-@app.get("/deadline", response_model=list[ProcessedContent])
-async def process_website(url: str):
+
+@app.get("/run-engine", response_model=list[ProcessedContent])
+async def run_engine():
     try:
-        results = web_processor.process(url)
-        csv_data = CSVHandler.download(results)
-        return Response(content=csv_data, media_type="text/csv", headers={"Content-Disposition": "attachment; filename=processed_data.csv"})
+        results = engine.run()  # Run the engine and get the aggregated results
+        return results
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing URL: {str(e)}")
-
+        raise HTTPException(status_code=500, detail=f"Error running engine: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
