@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 
 class AbstractSource(ABC):
     @abstractmethod
@@ -6,16 +7,39 @@ class AbstractSource(ABC):
         pass
 
     @abstractmethod
-    def getPrimaryContent(self):
+    def get_primary_content(self):
         pass
 
     @abstractmethod
-    def getChildLinks(self):
+    def get_child_links(self):
         pass
 
     @abstractmethod
-    def processChildren(self):
+    def process_children(self):
         pass
+
+    @abstractmethod
+    def to_jSON(self):
+        pass
+
+    def extract_date_time(self, date_str):
+        # Define the format of the input string
+        date_format = "%B %d, %Y %I:%M%p"
+        
+        # Convert the input string to a datetime object
+        dt = datetime.strptime(date_str, date_format)
+        
+        # Format the extracted date and time
+        extracted_date = dt.strftime("%Y-%m-%d")
+        extracted_time = dt.strftime("%H:%M:%S")
+    
+        return extracted_date, extracted_time
+
+    def get_current_date_and_time(self):
+        now = datetime.now()
+        captured_date = now.strftime("%Y-%m-%d")
+        captured_time = now.strftime("%H:%M:%S")
+        return captured_date, captured_time
 
     def merge_lists_by_key(self, list1, list2, key):
         # Create a dictionary to store merged objects by the common key

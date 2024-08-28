@@ -20,14 +20,15 @@ class Deadline(AbstractSource):
 
     def process(self, url):
         stories = []
-        firstPageSoup = self.getPrimaryContent(url)
+        firstPageSoup = self.get_primary_content(url)
         if firstPageSoup:
-            stories = self.getStories(firstPageSoup)
+            stories = self.get_stories(firstPageSoup)
             parent_links = [story['url'] for story in stories]
-            detailed_stories = self.processChildren(parent_links)
-        return self.merge_lists_by_key(detailed_stories, stories, 'url')
+            detailed_stories = self.process_children(parent_links)
+        result = self.merge_lists_by_key(detailed_stories, stories, 'url')
+        return self.to_jSON(result)
 
-    def getPrimaryContent(self, url):
+    def get_primary_content(self, url):
         logging.info(f"Fetching primary content from {url}")
         response = requests.get(url)
         if response.status_code == 200:
@@ -37,7 +38,7 @@ class Deadline(AbstractSource):
             logging.error(f"Failed to retrieve the page: {response.status_code}")
             return None
 
-    def getStories(self, soup):
+    def get_stories(self, soup):
         logging.info("Getting all stories")
         stories = []
 
@@ -78,7 +79,7 @@ class Deadline(AbstractSource):
 
         return stories
 
-    def getChildLinks(self, firstPageSoup):
+    def get_child_links(self, firstPageSoup):
         logging.info("Getting parent links")
         parent_links = []
         links = firstPageSoup.find_all('a', class_=self.parentLinkClassName)
@@ -86,19 +87,19 @@ class Deadline(AbstractSource):
             parent_links.append(link.get('href'))
         return parent_links
 
-    def processChildren(self, parent_links):
+    def process_children(self, parent_links):
         processed_contents = []
         for url in parent_links:
             logging.info(f"Processing link: {url}")
-            content = self.getPrimaryContent(url)
+            content = self.get_primary_content(url)
             if content:
-                title = self.getHeadline(content)
-                child_content = self.getContent(content)
-                author = self.getAuthor(content)
-                author_link = self.getAuthorLink(content)
-                date = self.getDate(content)
-                categories = self.getCategories(content)
-                banner = self.getBannerImage(content)
+                title = self.get_headline(content)
+                child_content = self.get_content(content)
+                author = self.get_author(content)
+                author_link = self.get_author_link(content)
+                date = self.get_date(content)
+                categories = self.get_categories(content)
+                banner = self.get_banner_image(content)
                 processed_content = {
                     "title": title,
                     "content": child_content,
@@ -112,21 +113,21 @@ class Deadline(AbstractSource):
                 processed_contents.append(processed_content)
         return processed_contents
 
-    def getHeadline(self, soup):
+    def get_headline(self, soup):
         logging.info("Getting title")
         title_element = soup.find('h1', class_=self.titleClassName)
         if title_element:
             return title_element.get_text(strip=True)
         return None
 
-    def getBannerImage(self, soup):
+    def get_banner_image(self, soup):
         logging.info("Getting banner image")
         banner_element = soup.find('img', class_=self.bannerImageClassname)
         if banner_element:
             return banner_element.get('data-lazy-src')
         return None
 
-    def getContent(self, soup):
+    def get_content(self, soup):
         logging.info("Getting child content")
         child_contents = []
         elements = soup.find_all('div', class_=self.childContentClassName)
@@ -136,7 +137,7 @@ class Deadline(AbstractSource):
                 child_contents.append(text)
         return child_contents
 
-    def getAuthor(self, soup):
+    def get_author(self, soup):
         logging.info("Getting author")
         author_element = soup.find('p', class_=self.authorClassName)
         if author_element:
@@ -146,7 +147,7 @@ class Deadline(AbstractSource):
             return author_name
         return None
         
-    def getAuthorLink(self, soup):
+    def get_author_link(self, soup):
         logging.info("Getting author")
         author_element = soup.find('p', class_=self.authorClassName)
         if author_element:
@@ -156,14 +157,14 @@ class Deadline(AbstractSource):
             return author_url 
         return None
     
-    def getDate(self, soup):
+    def get_date(self, soup):
         logging.info("Getting date")
         date_element = soup.find('time', class_=self.dateClassName)
         if date_element:
             return date_element.get_text(strip=True)
         return None
 
-    def getCategories(self, soup):
+    def get_categories(self, soup):
         logging.info("Getting categories")
         categories = []
         nav_items = soup.find_all('li', class_=self.categoriesClassName)
@@ -172,3 +173,28 @@ class Deadline(AbstractSource):
             if a_tag:
                 categories.append(a_tag.get_text(strip=True))
         return categories
+    
+    def to_jSON(self, objects):
+        json_list = []
+        captured_date, captured_time =  self.get_current_date_and_time()
+        
+        for obj in objects:
+            publish_date, publish_time = self.extract_date_time(obj.get('date'))
+            json_list.append({
+                "source": 'deadline',
+                "sourceIconURL": 'deadline',
+                "sourceSection": obj.get("categories", [])[0] if obj.get("categories") else "",
+                "title": obj.get("title", ""),
+                "content": obj.get("content", ""),
+                "author": obj.get("author_name", ""),
+                "urlArticle": obj.get("url", ""),
+                "urlBannerImage": obj.get("banner", ""),
+                "urlThumbnailImage": obj.get("thumbnail", ""),
+                
+                "publishedDate": publish_date,
+                "publishedTime": publish_time,
+                "capturedDate": captured_date,
+                "capturedTime": captured_time
+            })
+        return json_list
+
