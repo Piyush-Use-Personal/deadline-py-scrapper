@@ -1,12 +1,18 @@
-import requests
+import sys
+from loguru import logger
 from bs4 import BeautifulSoup
-import logging
+import requests
+from typing import List, Dict, Optional, Union
+
 from .abstract import AbstractSource
 
-logging.basicConfig(level=logging.INFO)
+# Configure loguru to output logs to the console
+logger.remove()
+logger.add(sys.stdout, level="INFO")
 
 class Deadline(AbstractSource):
-    def __init__(self):
+    def __init__(self) -> None:
+        # Initialize class with specific CSS class names for various elements
         self.parentLinkClassName = "c-title__link"
         self.childContentClassName = "a-content"
         self.childExcludeClassName = "injected-related-story"
@@ -18,7 +24,12 @@ class Deadline(AbstractSource):
         self.bannerImageClassname = "c-figure__image"
         self.storyClassName = "river-story a-archive-grid__story"
 
-    def process(self, url):
+    def process(self, url: str) -> List[Dict[str, Union[str, List[str]]]]:
+        """
+        Main method to process the given URL.
+        Retrieves primary content, extracts stories, processes child links,
+        merges results, and converts to JSON format.
+        """
         stories = []
         firstPageSoup = self.get_primary_content(url)
         if firstPageSoup:
@@ -28,18 +39,26 @@ class Deadline(AbstractSource):
         result = self.merge_lists_by_key(detailed_stories, stories, 'url')
         return self.to_jSON(result)
 
-    def get_primary_content(self, url):
-        logging.info(f"Fetching primary content from {url}")
+    def get_primary_content(self, url: str) -> Optional[BeautifulSoup]:
+        """
+        Fetches and parses the primary content from the given URL.
+        Returns a BeautifulSoup object or None if the request fails.
+        """
+        logger.info(f"Fetching primary content from {url}")
         response = requests.get(url)
         if response.status_code == 200:
             soup = BeautifulSoup(response.content, 'html.parser')
             return soup
         else:
-            logging.error(f"Failed to retrieve the page: {response.status_code}")
+            logger.error(f"Failed to retrieve the page: {response.status_code}")
             return None
 
-    def get_stories(self, soup):
-        logging.info("Getting all stories")
+    def get_stories(self, soup: BeautifulSoup) -> List[Dict[str, Optional[str]]]:
+        """
+        Extracts story data from the given BeautifulSoup object.
+        Returns a list of dictionaries with story details.
+        """
+        logger.info("Getting all stories")
         stories = []
 
         story_elements = soup.find_all('div', class_=self.storyClassName)
@@ -79,18 +98,26 @@ class Deadline(AbstractSource):
 
         return stories
 
-    def get_child_links(self, firstPageSoup):
-        logging.info("Getting parent links")
+    def get_child_links(self, firstPageSoup: BeautifulSoup) -> List[str]:
+        """
+        Extracts parent links from the given BeautifulSoup object.
+        Returns a list of URLs.
+        """
+        logger.info("Getting parent links")
         parent_links = []
         links = firstPageSoup.find_all('a', class_=self.parentLinkClassName)
         for link in links:
             parent_links.append(link.get('href'))
         return parent_links
 
-    def process_children(self, parent_links):
+    def process_children(self, parent_links: List[str]) -> List[Dict[str, Optional[str]]]:
+        """
+        Processes each child link to extract detailed content.
+        Returns a list of dictionaries with detailed story content.
+        """
         processed_contents = []
         for url in parent_links:
-            logging.info(f"Processing link: {url}")
+            logger.info(f"Processing link: {url}")
             content = self.get_primary_content(url)
             if content:
                 title = self.get_headline(content)
@@ -113,22 +140,34 @@ class Deadline(AbstractSource):
                 processed_contents.append(processed_content)
         return processed_contents
 
-    def get_headline(self, soup):
-        logging.info("Getting title")
+    def get_headline(self, soup: BeautifulSoup) -> Optional[str]:
+        """
+        Retrieves the headline (title) from the given BeautifulSoup object.
+        Returns the title as a string or None if not found.
+        """
+        logger.info("Getting title")
         title_element = soup.find('h1', class_=self.titleClassName)
         if title_element:
             return title_element.get_text(strip=True)
         return None
 
-    def get_banner_image(self, soup):
-        logging.info("Getting banner image")
+    def get_banner_image(self, soup: BeautifulSoup) -> Optional[str]:
+        """
+        Retrieves the banner image URL from the given BeautifulSoup object.
+        Returns the URL as a string or None if not found.
+        """
+        logger.info("Getting banner image")
         banner_element = soup.find('img', class_=self.bannerImageClassname)
         if banner_element:
             return banner_element.get('data-lazy-src')
         return None
 
-    def get_content(self, soup):
-        logging.info("Getting child content")
+    def get_content(self, soup: BeautifulSoup) -> List[str]:
+        """
+        Extracts the main content from the given BeautifulSoup object.
+        Returns a list of text content.
+        """
+        logger.info("Getting child content")
         child_contents = []
         elements = soup.find_all('div', class_=self.childContentClassName)
         for element in elements:
@@ -137,35 +176,49 @@ class Deadline(AbstractSource):
                 child_contents.append(text)
         return child_contents
 
-    def get_author(self, soup):
-        logging.info("Getting author")
+    def get_author(self, soup: BeautifulSoup) -> Optional[str]:
+        """
+        Retrieves the author name from the given BeautifulSoup object.
+        Returns the author's name as a string or None if not found.
+        """
+        logger.info("Getting author")
         author_element = soup.find('p', class_=self.authorClassName)
         if author_element:
             author_link = author_element.find('a')
             if author_link:
-                author_name = author_link.find('span').get_text(strip=True)
-            return author_name
+                return author_link.find('span').get_text(strip=True)
         return None
         
-    def get_author_link(self, soup):
-        logging.info("Getting author")
+    def get_author_link(self, soup: BeautifulSoup) -> Optional[str]:
+        """
+        Retrieves the author link URL from the given BeautifulSoup object.
+        Returns the URL as a string or None if not found.
+        """
+        logger.info("Getting author link")
         author_element = soup.find('p', class_=self.authorClassName)
         if author_element:
             author_link = author_element.find('a')
             if author_link:
-                author_url  = author_link.get('href')
-            return author_url 
+                return author_link.get('href')
         return None
     
-    def get_date(self, soup):
-        logging.info("Getting date")
+    def get_date(self, soup: BeautifulSoup) -> Optional[str]:
+        """
+        Retrieves the publication date from the given BeautifulSoup object.
+        Returns the date as a string or None if not found.
+        """
+        logger.info("Getting date")
         date_element = soup.find('time', class_=self.dateClassName)
         if date_element:
             return date_element.get_text(strip=True)
         return None
 
-    def get_categories(self, soup):
-        logging.info("Getting categories")
+    def get_categories(self, soup: BeautifulSoup) -> List[str]:
+        """
+        Extracts categories from the given BeautifulSoup object.
+        Returns a list of category names.
+        """
+        logger.info("Getting categories")
         categories = []
         nav_items = soup.find_all('li', class_=self.categoriesClassName)
         for item in nav_items:
@@ -174,9 +227,13 @@ class Deadline(AbstractSource):
                 categories.append(a_tag.get_text(strip=True))
         return categories
     
-    def to_jSON(self, objects):
+    def to_jSON(self, objects: List[Dict[str, Optional[str]]]) -> List[Dict[str, str]]:
+        """
+        Converts the list of story objects into JSON format.
+        Adds additional metadata such as captured date and time.
+        """
         json_list = []
-        captured_date, captured_time =  self.get_current_date_and_time()
+        captured_date, captured_time = self.get_current_date_and_time()
         
         for obj in objects:
             publish_date, publish_time = self.extract_date_time(obj.get('date'))
@@ -197,4 +254,3 @@ class Deadline(AbstractSource):
                 "capturedTime": captured_time
             })
         return json_list
-
