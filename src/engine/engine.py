@@ -1,11 +1,13 @@
 from .deadline import Deadline  # Relative import within the same directory
+from .variety import Variety  # Relative import within the same directory
 # from some_module import AnotherSource
 
 class Engine:
     def __init__(self):
         # List of source classes to be processed with their corresponding URLs
         self.sources = [
-            {"class": Deadline, "enabled": True, "url": "https://deadline.com/v/film/"},
+            # {"class": Deadline, "enabled": True, "url": "https://deadline.com/v/film/"},
+            {"class": Variety, "enabled": True, "url": "https://variety.com/v/film/"},
             # Add other sources here, e.g.:
             # {"class": AnotherSource, "enabled": False, "url": "https://example.com/another"},
         ]
