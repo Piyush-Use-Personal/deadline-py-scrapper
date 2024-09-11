@@ -11,10 +11,6 @@ class AbstractSource(ABC):
         pass
 
     @abstractmethod
-    def get_child_links(self):
-        pass
-
-    @abstractmethod
     def process_children(self):
         pass
 

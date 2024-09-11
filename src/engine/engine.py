@@ -1,4 +1,5 @@
 from .deadline import Deadline  # Relative import within the same directory
+from .hollywoodreporter import HollywoodReporter  # Relative import within the same directory
 # from some_module import AnotherSource
 
 class Engine:
@@ -7,6 +8,7 @@ class Engine:
         self.sources = [
             {"class": Deadline, "enabled": True, "url": "https://deadline.com/v/film/"},
             # Add other sources here, e.g.:
+            {"class": HollywoodReporter, "enabled": True, "url": "https://www.hollywoodreporter.com/c/movies/"},
             # {"class": AnotherSource, "enabled": False, "url": "https://example.com/another"},
         ]
 

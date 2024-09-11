@@ -6,7 +6,7 @@ class CSVHandler:
     def download(data):
         output = io.StringIO()
         fieldnames = [
-            "title", "content", "author", "published_date", "published_time",
+            "title", "subtitle", "content", "author", "published_date", "published_time",
             "url_article", "url_banner_image", "url_thumbnail_image",
             "captured_date", "captured_time", "source", "source_icon_url", "source_section"
         ]
@@ -19,6 +19,7 @@ class CSVHandler:
         for item in data:
             csv_writer.writerow({
                 "title": item.get("title", ""),
+                "subtitle": item.get("subtitle", ""),
                 "content": "\n".join(item.get("content", [])),  # Join content list into a single string
                 "author": item.get("author", ""),
                 "published_date": item.get("publishedDate", ""),
