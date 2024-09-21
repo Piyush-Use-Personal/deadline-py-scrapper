@@ -4,6 +4,7 @@
         "fastapi",
         "hollywoodreporter",
         "loguru",
-        "pydantic"
+        "pydantic",
+        "screenrant"
     ]
 }

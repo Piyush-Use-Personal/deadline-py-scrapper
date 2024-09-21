@@ -18,6 +18,22 @@ class AbstractSource(ABC):
     def to_jSON(self):
         pass
 
+    def extract_date_time_from_iso(self, iso_string: str):
+        """
+        Extracts date and time from an ISO 8601 string.
+
+        :param iso_string: The ISO 8601 date-time string
+        :return: A tuple containing the date and time
+        """
+        # Parse the ISO string
+        dt = datetime.fromisoformat(iso_string.replace("Z", "+00:00"))
+        
+        # Format date and time
+        date = dt.date().isoformat()  # 'YYYY-MM-DD'
+        time = dt.time().isoformat()  # 'HH:MM:SS'
+
+        return date, time
+    
     def extract_date_time(self, date_str):
         # Define the format of the input string
         date_format = "%B %d, %Y %I:%M%p"
