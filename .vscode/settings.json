@@ -5,6 +5,7 @@
         "hollywoodreporter",
         "loguru",
         "pydantic",
+        "screendaily",
         "screenrant",
         "Slashfilm"
     ]
