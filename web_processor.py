@@ -5,12 +5,6 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 class WebProcessor:
-    def __init__(self):
-        self.parentLinkClassName = "c-title__link"
-        self.childContentClassName = "a-content"
-        self.childExcludeClassName = "injected-related-story"
-        self.titleClassName = "c-title"
-        self.authorClassName = "pmc-u-margin-tb-00 pmc-u-font-size-14"
 
     def getPrimaryContent(self, url):
         logging.info(f"Fetching primary content from {url}")
@@ -25,7 +19,7 @@ class WebProcessor:
     def getParentLinks(self, soup):
         logging.info("Getting parent links")
         parent_links = []
-        links = soup.find_all('a', class_=self.parentLinkClassName)
+        links = soup.find_all('a', class_="c-title__link")
         for link in links:
             parent_links.append(link.get('href'))
         return parent_links
@@ -49,7 +43,7 @@ class WebProcessor:
 
     def getTitle(self, soup):
         logging.info("Getting title")
-        title_element = soup.find('h1', class_=self.titleClassName)
+        title_element = soup.find('h1', class_="c-title")
         if title_element:
             return title_element.get_text(strip=True)
         return None
@@ -57,16 +51,16 @@ class WebProcessor:
     def getChildContent(self, soup):
         logging.info("Getting child content")
         child_contents = []
-        elements = soup.find_all('div', class_=self.childContentClassName)
+        elements = soup.find_all('div', class_="a-content")
         for element in elements:
-            if self.childExcludeClassName not in element.get('class', []):
+            if "injected-related-story" not in element.get('class', []):
                 text = element.get_text(strip=True)
                 child_contents.append(text)
         return child_contents
 
     def getAuthor(self, soup):
         logging.info("Getting author")
-        author_element = soup.find('p', class_=self.authorClassName)
+        author_element = soup.find('p', class_="pmc-u-margin-tb-00 pmc-u-font-size-14")
         if author_element:
             return author_element.get_text(strip=True)
         return None

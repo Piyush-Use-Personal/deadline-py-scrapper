@@ -11,18 +11,6 @@ logger.remove()
 logger.add(sys.stdout, level="INFO")
 
 class Variety(AbstractSource):
-    def __init__(self) -> None:
-        # Initialize class with specific CSS class names for various elements
-        self.parentLinkClassName = "c-title__link"
-        self.childContentClassName = "a-content"
-        self.childExcludeClassName = "injected-related-story"
-        self.titleClassName = "c-title"
-        self.authorClassName = "pmc-u-margin-tb-00 pmc-u-font-size-14"
-        self.dateClassName = "pmc-u-color-grey-medium-dark"
-        self.categoriesClassName = "o-nav__list-item"
-        self.categoryLinkClassName = "c-nav-link"
-        self.bannerImageClassname = "c-figure__image"
-        self.storyClassName = "river-story a-archive-grid__story"
 
     def process(self, url: str) -> List[Dict[str, Union[str, List[str]]]]:
         """
@@ -92,7 +80,7 @@ class Variety(AbstractSource):
         """
         logger.info("Getting parent links")
         parent_links = []
-        links = firstPageSoup.find_all('a', class_=self.parentLinkClassName)
+        links = firstPageSoup.find_all('a', class_="c-title__link")
         for link in links:
             parent_links.append(link.get('href'))
         return parent_links

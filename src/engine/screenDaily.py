@@ -9,18 +9,8 @@ logger.remove()
 logger.add(sys.stdout, level="INFO")
 class ScreenDaily(AbstractSource):
     def __init__(self) -> None:
-        # Initialize class with specific CSS class names for various elements
-        self.parentLinkClassName = "bc-title__link"
-        self.childContentClassName = "bc-content"
-        self.childExcludeClassName = "injected-story"
-        self.titleClassName = "bc-title"
-        self.authorClassName = "author-class"
-        self.dateClassName = "date-class"
-        self.categoriesClassName = "categories-class"
-        self.categoryLinkClassName = "category-link-class"
-        self.bannerImageClassname = "banner-image-class"
-        self.storyClassName = "story-class"
         self.domain = "https://www.screendaily.com"
+        
     def process(self, url: str) -> List[Dict[str, Union[str, List[str]]]]:
         """
         Main method to process the given URL.
@@ -76,7 +66,7 @@ class ScreenDaily(AbstractSource):
         """
         logger.info("Getting parent links")
         parent_links = []
-        links = firstPageSoup.find_all('a', class_=self.parentLinkClassName)
+        links = firstPageSoup.find_all('a', class_="bc-title__link")
         for link in links:
             parent_links.append(link.get('href'))
         return parent_links
@@ -176,9 +166,9 @@ class ScreenDaily(AbstractSource):
         """
         logger.info("Getting categories")
         categories = []
-        nav_items = soup.find_all('li', class_=self.categoriesClassName)
+        nav_items = soup.find_all('li', class_="categories-class")
         for item in nav_items:
-            a_tag = item.find('a', class_=self.categoryLinkClassName)
+            a_tag = item.find('a', class_="category-link-class")
             if a_tag:
                 categories.append(a_tag.get_text(strip=True))
         return categories

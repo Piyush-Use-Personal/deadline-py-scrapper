@@ -11,10 +11,6 @@ logger.remove()
 logger.add(sys.stdout, level="INFO")
 
 class HollywoodReporter(AbstractSource):
-    def __init__(self) -> None:
-        # Initialize class with specific CSS class names for various elements
-        self.parentLinkClassName = "c-title__link"
-        
 
     def process(self, url: str) -> List[Dict[str, Union[str, List[str]]]]:
         """

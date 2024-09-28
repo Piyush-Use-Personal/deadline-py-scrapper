@@ -11,19 +11,6 @@ logger.remove()
 logger.add(sys.stdout, level="INFO")
 
 class Deadline(AbstractSource):
-    def __init__(self) -> None:
-        # Initialize class with specific CSS class names for various elements
-        self.parentLinkClassName = "c-title__link"
-        self.childContentClassName = "a-content"
-        self.childExcludeClassName = "injected-related-story"
-        self.titleClassName = "c-title"
-        self.authorClassName = "pmc-u-margin-tb-00 pmc-u-font-size-14"
-        self.dateClassName = "pmc-u-color-grey-medium-dark"
-        self.categoriesClassName = "o-nav__list-item"
-        self.categoryLinkClassName = "c-nav-link"
-        self.bannerImageClassname = "c-figure__image"
-        self.storyClassName = "river-story a-archive-grid__story"
-
     def process(self, url: str) -> List[Dict[str, Union[str, List[str]]]]:
         """
         Main method to process the given URL.
@@ -61,7 +48,7 @@ class Deadline(AbstractSource):
         logger.info("Getting all stories")
         stories = []
 
-        story_elements = soup.find_all('div', class_=self.storyClassName)
+        story_elements = soup.find_all('div', class_="river-story a-archive-grid__story")
         for story in story_elements:
             story_data = {}
 
@@ -134,7 +121,7 @@ class Deadline(AbstractSource):
         Returns the title as a string or None if not found.
         """
         logger.info("Getting title")
-        title_element = soup.find('h1', class_=self.titleClassName)
+        title_element = soup.find('h1', class_="c-title")
         if title_element:
             return title_element.get_text(strip=True)
         return None
@@ -145,7 +132,7 @@ class Deadline(AbstractSource):
         Returns the URL as a string or None if not found.
         """
         logger.info("Getting banner image")
-        banner_element = soup.find('img', class_=self.bannerImageClassname)
+        banner_element = soup.find('img', class_="c-figure__image")
         if banner_element:
             return banner_element.get('data-lazy-src')
         return None
@@ -157,9 +144,9 @@ class Deadline(AbstractSource):
         """
         logger.info("Getting child content")
         child_contents = []
-        elements = soup.find_all('div', class_=self.childContentClassName)
+        elements = soup.find_all('div', class_="a-content")
         for element in elements:
-            if self.childExcludeClassName not in element.get('class', []):
+            if "injected-related-story" not in element.get('class', []):
                 text = element.get_text(strip=True)
                 child_contents.append(text)
         return child_contents
@@ -170,7 +157,7 @@ class Deadline(AbstractSource):
         Returns the author's name as a string or None if not found.
         """
         logger.info("Getting author")
-        author_element = soup.find('p', class_=self.authorClassName)
+        author_element = soup.find('p', class_="pmc-u-margin-tb-00 pmc-u-font-size-14")
         if author_element:
             author_link = author_element.find('a')
             if author_link:
@@ -183,7 +170,7 @@ class Deadline(AbstractSource):
         Returns the URL as a string or None if not found.
         """
         logger.info("Getting author link")
-        author_element = soup.find('p', class_=self.authorClassName)
+        author_element = soup.find('p', class_="pmc-u-margin-tb-00 pmc-u-font-size-14")
         if author_element:
             author_link = author_element.find('a')
             if author_link:
@@ -196,7 +183,7 @@ class Deadline(AbstractSource):
         Returns the date as a string or None if not found.
         """
         logger.info("Getting date")
-        date_element = soup.find('time', class_=self.dateClassName)
+        date_element = soup.find('time', class_="pmc-u-color-grey-medium-dark")
         if date_element:
             return date_element.get_text(strip=True)
         return None
@@ -208,9 +195,9 @@ class Deadline(AbstractSource):
         """
         logger.info("Getting categories")
         categories = []
-        nav_items = soup.find_all('li', class_=self.categoriesClassName)
+        nav_items = soup.find_all('li', class_="o-nav__list-item")
         for item in nav_items:
-            a_tag = item.find('a', class_=self.categoryLinkClassName)
+            a_tag = item.find('a', class_="c-nav-link")
             if a_tag:
                 categories.append(a_tag.get_text(strip=True))
         return categories

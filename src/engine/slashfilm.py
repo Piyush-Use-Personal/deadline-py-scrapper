@@ -9,18 +9,8 @@ logger.remove()
 logger.add(sys.stdout, level="INFO")
 class Slashfilm(AbstractSource):
     def __init__(self) -> None:
-        # Initialize class with specific CSS class names for various elements
-        self.parentLinkClassName = "bc-title__link"
-        self.childContentClassName = "bc-content"
-        self.childExcludeClassName = "injected-story"
-        self.titleClassName = "bc-title"
-        self.authorClassName = "author-class"
-        self.dateClassName = "date-class"
-        self.categoriesClassName = "categories-class"
-        self.categoryLinkClassName = "category-link-class"
-        self.bannerImageClassname = "banner-image-class"
-        self.storyClassName = "story-class"
         self.domain = "https://www.slashfilm.com"
+        
     def process(self, url: str) -> List[Dict[str, Union[str, List[str]]]]:
         """
         Main method to process the given URL.
@@ -91,7 +81,7 @@ class Slashfilm(AbstractSource):
         """
         logger.info("Getting parent links")
         parent_links = []
-        links = firstPageSoup.find_all('a', class_=self.parentLinkClassName)
+        links = firstPageSoup.find_all('a', class_="bc-title__link")
         for link in links:
             parent_links.append(link.get('href'))
         return parent_links
@@ -157,7 +147,7 @@ class Slashfilm(AbstractSource):
         Returns the author's name as a string or None if not found.
         """
         logger.info("Getting author")
-        author_element = soup.find('p', class_=self.authorClassName)
+        author_element = soup.find('p', class_="author-class")
         if author_element:
             author_link = author_element.find('a')
             if author_link:
@@ -170,7 +160,7 @@ class Slashfilm(AbstractSource):
         Returns the URL as a string or None if not found.
         """
         logger.info("Getting author link")
-        author_element = soup.find('p', class_=self.authorClassName)
+        author_element = soup.find('p', class_="author-class")
         if author_element:
             author_link = author_element.find('a')
             if author_link:
@@ -183,7 +173,7 @@ class Slashfilm(AbstractSource):
         Returns the date as a string or None if not found.
         """
         logger.info("Getting date")
-        date_element = soup.find('time', class_=self.dateClassName)
+        date_element = soup.find('time', class_="date-class")
         if date_element:
             return date_element.get_text(strip=True)
         return None
@@ -194,9 +184,9 @@ class Slashfilm(AbstractSource):
         """
         logger.info("Getting categories")
         categories = []
-        nav_items = soup.find_all('li', class_=self.categoriesClassName)
+        nav_items = soup.find_all('li', class_="categories-class")
         for item in nav_items:
-            a_tag = item.find('a', class_=self.categoryLinkClassName)
+            a_tag = item.find('a', class_="category-link-class")
             if a_tag:
                 categories.append(a_tag.get_text(strip=True))
         return categories
