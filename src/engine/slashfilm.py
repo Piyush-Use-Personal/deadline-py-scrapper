@@ -7,7 +7,7 @@ from .abstract import AbstractSource
 # Configure loguru to output logs to the console
 logger.remove()
 logger.add(sys.stdout, level="INFO")
-class Slashfilm(AbstractSource):
+class SlashFilm(AbstractSource):
     def __init__(self) -> None:
         self.domain = "https://www.slashfilm.com"
         
