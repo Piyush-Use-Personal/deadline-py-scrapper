@@ -15,8 +15,8 @@ class Engine:
             # Add other sources here, e.g.:
             # {"class": HollywoodReporter, "enabled": True, "url": "https://www.hollywoodreporter.com/c/movies/"},
             # {"class": ScreenRant, "enabled": True, "url": "https://screenrant.com/movie-news/"},
-            # {"class": Slashfilm, "enabled": True, "url": "https://www.slashfilm.com/category/movies/"},
-            # {"class": ScreenDaily, "enabled": True, "url": "https://www.screendaily.com/box-office"},
+            # {"class": SlashFilm, "enabled": True, "url": "https://www.slashfilm.com/category/movies/"},
+            {"class": ScreenDaily, "enabled": True, "url": "https://www.screendaily.com/box-office"},
             # {"class": AnotherSource, "enabled": False, "url": "https://example.com/another"},
         ]
 

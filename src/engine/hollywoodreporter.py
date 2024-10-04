@@ -25,7 +25,7 @@ class HollywoodReporter(AbstractSource):
             parent_links = [story['url'] for story in stories]
             detailed_stories = self.process_children(parent_links)
         result = self.merge_lists_by_key(detailed_stories, stories, 'url')
-        return self.to_jSON(result)
+        return self.to_json(result)
 
     def get_primary_content(self, url: str) -> Optional[BeautifulSoup]:
         """
@@ -232,7 +232,7 @@ class HollywoodReporter(AbstractSource):
                 categories.append(a_tag.get_text(strip=True))
         return categories
     
-    def to_jSON(self, objects: List[Dict[str, Optional[str]]]) -> List[Dict[str, str]]:
+    def to_json(self, objects: List[Dict[str, Optional[str]]]) -> List[Dict[str, str]]:
         """
         Converts the list of story objects into JSON format.
         Adds additional metadata such as captured date and time.

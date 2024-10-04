@@ -24,7 +24,7 @@ class SlashFilm(AbstractSource):
             parent_links = [story['url'] for story in stories]
             detailed_stories = self.process_children(parent_links)
         result = self.merge_lists_by_key(detailed_stories, stories, 'url')
-        return self.to_jSON(result)
+        return self.to_json(result)
     def get_primary_content(self, url: str) -> Optional[BeautifulSoup]:
         """
         Fetches and parses the primary content from the given URL.
@@ -45,7 +45,7 @@ class SlashFilm(AbstractSource):
         """
         logger.info("Getting all stories")
         stories = []
-        story_elements = soup.find_all('li', class_='article-item')
+        story_elements = soup.find_all('article', class_='article-block')
         for story in story_elements:
             story_data = {}
             # Extract title and URL
@@ -54,9 +54,9 @@ class SlashFilm(AbstractSource):
                 story_data['title'] = title_element.find('a').get_text(strip=True)
                 story_data['url'] = self.domain + title_element.find('a').get('href')
             # Extract author
-            author_element = story.find('span', class_='author')
+            author_element = story.find('div', class_='more-article-info')
             if author_element :
-                author_name = author_element.get_text(strip=True)
+                author_name = author_element.find('span', class_='author').get_text(strip=True)
                 author_url = ""
                 story_data['author_name'] = author_name
                 story_data['author_url'] = author_url
@@ -140,6 +140,7 @@ class SlashFilm(AbstractSource):
         for child in elements.children:
             if child.name in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p']:
                 child_contents.append(child.get_text(strip=True))
+        # print(child_contents)
         return child_contents
     def get_author(self, soup: BeautifulSoup) -> Optional[str]:
         """
@@ -191,7 +192,7 @@ class SlashFilm(AbstractSource):
                 categories.append(a_tag.get_text(strip=True))
         return categories
     
-    def to_jSON(self, objects: List[Dict[str, Optional[str]]]) -> List[Dict[str, str]]:
+    def to_json(self, objects: List[Dict[str, Optional[str]]]) -> List[Dict[str, str]]:
         """
         Converts the list of story objects into JSON format.
         Adds additional metadata such as captured date and time.
@@ -201,20 +202,23 @@ class SlashFilm(AbstractSource):
         
         for obj in objects:
             publish_date, publish_time = self.extract_date_time_from_iso(obj.get('time'))
+            print(obj.get("content"))
             json_list.append({
                 "source": 'slashfilm',
                 "sourceIconURL": 'slashfilm',
-                "sourceSection": obj.get("categories", [])[0] if obj.get("categories") else obj.get("category", "") if "category" in obj else "",
+                "sourceSection": obj.get("categories", [])[0] if obj.get("categories") else "",
                 "title": obj.get("title", ""),
+                "subtitle": obj.get("tagline", ""),
                 "content": obj.get("content", ""),
-                "timePublished": publish_time,
-                "datePublished": publish_date,
-                "authorName": obj.get("author_name", ""),
-                "authorLink": obj.get("author_url", ""),
-                "url": obj.get("url", ""),
-                "banner": obj.get("banner", ""),
-                "timeCaptured": captured_time,
-                "dateCaptured": captured_date,
+                "author": obj.get("author_name", ""),
+                "urlArticle": obj.get("url", ""),
+                "urlBannerImage": obj.get("banner", ""),
+                "urlThumbnailImage": obj.get("thumbnail", ""),
+                
+                "publishedDate": publish_date,
+                "publishedTime": publish_time,
+                "capturedDate": captured_date,
+                "capturedTime": captured_time
             })
         
         return json_list

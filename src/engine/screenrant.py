@@ -27,7 +27,7 @@ class ScreenRant(AbstractSource):
             parent_links = [story['url'] for story in stories]
             detailed_stories = self.process_children(parent_links)
         result = self.merge_lists_by_key(detailed_stories, stories, 'url')
-        return self.to_jSON(result)
+        return self.to_json(result)
 
     def get_primary_content(self, url: str) -> Optional[BeautifulSoup]:
         """
@@ -62,7 +62,7 @@ class ScreenRant(AbstractSource):
                 story_data['url'] = self.domain + title_element.find('a').get('href')
 
             # Extract author
-            author_element = story.find('div', class_='w-author-name')
+            author_element = story.find('div', class_='w-author')
             if author_element and author_element.find('a'):
                 author_name = author_element.find('a').get_text(strip=True)
                 author_url = author_element.find('a').get('href')
@@ -80,9 +80,9 @@ class ScreenRant(AbstractSource):
                 story_data['category'] = category_element.find('a').get_text(strip=True)
 
             # Extract image URL
-            image_element = story.find('img')
+            image_element = story.find('div', class_='heading_image')
             if image_element:
-                story_data['thumbnail'] = image_element.get('src')
+                story_data['thumbnail'] = image_element.find('img').get('src')
 
             stories.append(story_data)
 
@@ -163,11 +163,11 @@ class ScreenRant(AbstractSource):
         Returns the author's name as a string or None if not found.
         """
         logger.info("Getting author")
-        author_element = soup.find('p', class_="author-class")
+        author_element = soup.find('div', class_="w-author")
         if author_element:
             author_link = author_element.find('a')
             if author_link:
-                return author_link.find('span').get_text(strip=True)
+                return author_link.get_text(strip=True)
         return None
         
     def get_author_link(self, soup: BeautifulSoup) -> Optional[str]:
@@ -176,7 +176,7 @@ class ScreenRant(AbstractSource):
         Returns the URL as a string or None if not found.
         """
         logger.info("Getting author link")
-        author_element = soup.find('p', class_="author-class")
+        author_element = soup.find('p', class_="w-author")
         if author_element:
             author_link = author_element.find('a')
             if author_link:
@@ -208,7 +208,7 @@ class ScreenRant(AbstractSource):
                 categories.append(a_tag.get_text(strip=True))
         return categories
     
-    def to_jSON(self, objects: List[Dict[str, Optional[str]]]) -> List[Dict[str, str]]:
+    def to_json(self, objects: List[Dict[str, Optional[str]]]) -> List[Dict[str, str]]:
         """
         Converts the list of story objects into JSON format.
         Adds additional metadata such as captured date and time.
