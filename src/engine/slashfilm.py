@@ -98,11 +98,15 @@ class SlashFilm(AbstractSource):
                 title = self.get_headline(content)
                 child_content = self.get_content(content)
                 banner = self.get_banner_image(content)
+                categories = self.get_categories(content)
+                date = self.get_date(content)
                 processed_content = {
                     "title": title,
                     "content": child_content,
+                    "date": date,
                     "url": url,
                     "banner": banner,
+                    "categories": categories,
                 }
                 processed_contents.append(processed_content)
         return processed_contents
@@ -174,9 +178,9 @@ class SlashFilm(AbstractSource):
         Returns the date as a string or None if not found.
         """
         logger.info("Getting date")
-        date_element = soup.find('time', class_="date-class")
+        date_element = soup.find('span', class_="byline-timestamp")
         if date_element:
-            return date_element.get_text(strip=True)
+            return date_element.find('time').get_text(strip=True)
         return None
     def get_categories(self, soup: BeautifulSoup) -> List[str]:
         """
@@ -185,10 +189,10 @@ class SlashFilm(AbstractSource):
         """
         logger.info("Getting categories")
         categories = []
-        nav_items = soup.find_all('li', class_="categories-class")
+        nav_items = soup.find_all('div', class_="breadcrumbs")
         for item in nav_items:
-            a_tag = item.find('a', class_="category-link-class")
-            if a_tag:
+            a_tags = item.find('a')
+            for a_tag in a_tags:
                 categories.append(a_tag.get_text(strip=True))
         return categories
     
@@ -201,8 +205,7 @@ class SlashFilm(AbstractSource):
         captured_date, captured_time = self.get_current_date_and_time()
         
         for obj in objects:
-            publish_date, publish_time = self.extract_date_time_from_iso(obj.get('time'))
-            print(obj.get("content"))
+            publish_date, publish_time = self.parse_datetime(obj.get('date'))
             json_list.append({
                 "source": 'slashfilm',
                 "sourceIconURL": 'slashfilm',

@@ -54,32 +54,34 @@ class AbstractSource(ABC):
 
     def parse_datetime(self, date_str: str) -> Optional[Tuple[datetime, datetime]]:
         def parse_date(date_string:str):
-            formats = ["%B %d, %Y %I:%M%p", "%b %d, %Y %I:%M%p"]
+            formats = ["%B %d, %Y %I:%M%p", "%b %d, %Y %I:%M%p","%b. %d, %Y %I:%M %p"]
             for fmt in formats:
                 try:
                     return datetime.strptime(date_string, fmt)
                 except ValueError:
                     continue
-            return "Invalid date format"
+            print(date_string)
+            return ""
         
         if date_str: 
             # Remove the timezone abbreviation (PT) for parsing
-            date_str = date_str.replace("PT", "").strip()
+            date_str = date_str.replace("PT", "").replace("EST", "").replace("Updated:", "").strip()
             
             # Parse the string into a naive datetime object
             dt_naive =  parse_date(date_str)
-            
-            # Define timezone (Pacific Time)
-            pacific_tz = pytz.timezone('America/Los_Angeles')
-            
-            # Localize the naive datetime object to Pacific Time
-            dt_pacific = pacific_tz.localize(dt_naive)
-            
-            # Extract date and time separately
-            date_only = dt_pacific.strftime("%Y-%m-%d")  # Format as YYYY-MM-DD
-            time_only = dt_pacific.strftime("%I:%M %p")   # Format as HH:MM AM/PM
-            
-            return date_only, time_only
+
+            if(dt_naive):
+                # Define timezone (Pacific Time)
+                pacific_tz = pytz.timezone('America/Los_Angeles')
+                
+                # Localize the naive datetime object to Pacific Time
+                dt_pacific = pacific_tz.localize(dt_naive)
+                
+                # Extract date and time separately
+                date_only = dt_pacific.strftime("%Y-%m-%d")  # Format as YYYY-MM-DD
+                time_only = dt_pacific.strftime("%I:%M %p")   # Format as HH:MM AM/PM
+                
+                return date_only, time_only
         return "", ""
         
     def get_current_date_and_time(self):

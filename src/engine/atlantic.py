@@ -10,9 +10,9 @@ from .abstract import AbstractSource
 logger.remove()
 logger.add(sys.stdout, level="INFO")
 
-class ScreenRant(AbstractSource):
+class Atlantic(AbstractSource):
     def __init__(self) -> None:
-        self.domain = "https://screenrant.com"
+        self.domain = "https://theatlantic.com"
 
     def process(self, url: str) -> List[Dict[str, Union[str, List[str]]]]:
         """
@@ -51,18 +51,18 @@ class ScreenRant(AbstractSource):
         logger.info("Getting all stories")
         stories = []
 
-        story_elements = soup.find_all('div', class_='article')
+        story_elements = soup.find_all('article', class_='LandingRiver_promoItem__SLYUT')
         for story in story_elements:
             story_data = {}
 
             # Extract title and URL
-            title_element = story.find('h5', class_='display-card-title')
-            if title_element and title_element.find('a'):
-                story_data['title'] = title_element.find('a').get_text(strip=True)
-                story_data['url'] = self.domain + title_element.find('a').get('href')
+            title_element = story.find('a', class_='LandingRiver_titleLink__nUImQ')
+            if title_element and title_element.find('span'):
+                story_data['title'] = title_element.find('span').get_text(strip=True)
+                story_data['url'] = title_element.get('href')
 
             # Extract author
-            author_element = story.find('div', class_='w-author')
+            author_element = story.find('p', class_='LandingMetadata_root__qrlUA')
             if author_element and author_element.find('a'):
                 author_name = author_element.find('a').get_text(strip=True)
                 author_url = author_element.find('a').get('href')
@@ -70,34 +70,18 @@ class ScreenRant(AbstractSource):
                 story_data['author_url'] = author_url
 
             # Extract publication time
-            time_element = story.find('time', class_='display-card-date')
+            time_element = story.find('time', class_='LandingMetadata_datePublished__iRPUc')
+            print(time_element)
             if time_element:
                 story_data['time'] = time_element.get('datetime')
 
-            # Extract category
-            category_element = story.find('div', class_='w-display-card-category')
-            if category_element and category_element.find('a'):
-                story_data['category'] = category_element.find('a').get_text(strip=True)
-
             # Extract image URL
-            image_element = story.find('div', class_='heading_image')
+            image_element = story.find('img', class_='LandingRiver_image__VWDpl')
             if image_element:
-                story_data['thumbnail'] = image_element.find('img').get('src')
+                story_data['thumbnail'] = image_element.get('src')
             stories.append(story_data)
 
         return stories
-
-    def get_child_links(self, firstPageSoup: BeautifulSoup) -> List[str]:
-        """
-        Extracts parent links from the given BeautifulSoup object.
-        Returns a list of URLs.
-        """
-        logger.info("Getting parent links")
-        parent_links = []
-        links = firstPageSoup.find_all('a', class_="bc-title__link")
-        for link in links:
-            parent_links.append(link.get('href'))
-        return parent_links
 
     def process_children(self, parent_links: List[str]) -> List[Dict[str, Optional[str]]]:
         """
@@ -112,11 +96,13 @@ class ScreenRant(AbstractSource):
                 title = self.get_headline(content)
                 child_content = self.get_content(content)
                 banner = self.get_banner_image(content)
+                categories = self.get_categories(content)
                 processed_content = {
                     "title": title,
                     "content": child_content,
                     "url": url,
                     "banner": banner,
+                    "categories": categories,
                 }
                 processed_contents.append(processed_content)
         return processed_contents
@@ -127,7 +113,7 @@ class ScreenRant(AbstractSource):
         Returns the title as a string or None if not found.
         """
         logger.info("Getting title")
-        title_element = soup.find('h1', class_='article-header-title')
+        title_element = soup.find('h1', class_='ArticleTitle_root__VrZaG')
         if title_element:
             return title_element.get_text(strip=True)
         return None
@@ -138,9 +124,9 @@ class ScreenRant(AbstractSource):
         Returns the URL as a string or None if not found.
         """
         logger.info("Getting banner image")
-        heading_image = soup.find('div', class_="heading_image")
+        heading_image = soup.find('img', class_="Image_root__XxsOp ArticleLeadArt_image__HZS4B")
         if heading_image:
-            return heading_image.find('img').get('src')
+            return heading_image.get('src')
         return None
 
     def get_content(self, soup: BeautifulSoup) -> List[str]:
@@ -150,48 +136,11 @@ class ScreenRant(AbstractSource):
         """
         logger.info("Getting child content")
         child_contents = []
-        elements = soup.find('div', class_='content-block-regular')
+        elements = soup.find('section', class_='ArticleBody_root__2gF81')
         for child in elements.children:
             if child.name in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p']:
                 child_contents.append(child.get_text(strip=True))
         return child_contents
-
-    def get_author(self, soup: BeautifulSoup) -> Optional[str]:
-        """
-        Retrieves the author name from the given BeautifulSoup object.
-        Returns the author's name as a string or None if not found.
-        """
-        logger.info("Getting author")
-        author_element = soup.find('div', class_="w-author")
-        if author_element:
-            author_link = author_element.find('a')
-            if author_link:
-                return author_link.get_text(strip=True)
-        return None
-        
-    def get_author_link(self, soup: BeautifulSoup) -> Optional[str]:
-        """
-        Retrieves the author link URL from the given BeautifulSoup object.
-        Returns the URL as a string or None if not found.
-        """
-        logger.info("Getting author link")
-        author_element = soup.find('p', class_="w-author")
-        if author_element:
-            author_link = author_element.find('a')
-            if author_link:
-                return author_link.get('href')
-        return None
-    
-    def get_date(self, soup: BeautifulSoup) -> Optional[str]:
-        """
-        Retrieves the publication date from the given BeautifulSoup object.
-        Returns the date as a string or None if not found.
-        """
-        logger.info("Getting date")
-        date_element = soup.find('time', class_="date-class")
-        if date_element:
-            return date_element.get_text(strip=True)
-        return None
 
     def get_categories(self, soup: BeautifulSoup) -> List[str]:
         """
@@ -200,11 +149,9 @@ class ScreenRant(AbstractSource):
         """
         logger.info("Getting categories")
         categories = []
-        nav_items = soup.find_all('li', class_="categories-class")
+        nav_items = soup.find_all('a', class_="ArticleRubric_link__nl9hy")
         for item in nav_items:
-            a_tag = item.find('a', class_="category-link-class")
-            if a_tag:
-                categories.append(a_tag.get_text(strip=True))
+            categories.append(item.get_text(strip=True))
         return categories
     
     def to_json(self, objects: List[Dict[str, Optional[str]]]) -> List[Dict[str, str]]:
@@ -218,8 +165,8 @@ class ScreenRant(AbstractSource):
         for obj in objects:
             publish_date, publish_time = self.extract_date_time_from_iso(obj.get('time'))
             json_list.append({
-                "source": 'screenrant',
-                "sourceIconURL": 'screenrant',
+                "source": 'atlantic',
+                "sourceIconURL": 'atlantic',
                 "sourceSection": obj.get("categories", [])[0] if obj.get("categories") else "",
                 "title": obj.get("title", ""),
                 "content": obj.get("content", ""),

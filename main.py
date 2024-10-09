@@ -27,7 +27,7 @@ async def run_engine():
     try:
         results = engine.run()  # Run the engine and get the aggregated results
         csv_data = CSVHandler.download(results)
-        return Response(content=csv_data, media_type="text/csv", headers={"Content-Disposition": "attachment; filename=processed_data.csv"})
+        return Response(content=csv_data, media_type="text/csv", headers={"Content-Disposition": "attachment; filename=atlantic.csv"})
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error running engine: {str(e)}")

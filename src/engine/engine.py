@@ -4,6 +4,7 @@ from .screenrant import ScreenRant  # Relative import within the same directory
 from .slashfilm import SlashFilm  # Relative import within the same directory
 from .screenDaily import ScreenDaily  # Relative import within the same directory
 from .variety import Variety  # Relative import within the same directory
+from .atlantic import Atlantic  # Relative import within the same directory
 # from some_module import AnotherSource
 
 class Engine:
@@ -16,7 +17,8 @@ class Engine:
             # {"class": HollywoodReporter, "enabled": True, "url": "https://www.hollywoodreporter.com/c/movies/"},
             # {"class": ScreenRant, "enabled": True, "url": "https://screenrant.com/movie-news/"},
             # {"class": SlashFilm, "enabled": True, "url": "https://www.slashfilm.com/category/movies/"},
-            {"class": ScreenDaily, "enabled": True, "url": "https://www.screendaily.com/box-office"},
+            {"class": Atlantic, "enabled": True, "url": "https://www.theatlantic.com/culture/"},
+            # {"class": ScreenDaily, "enabled": True, "url": "https://www.screendaily.com/box-office"},
             # {"class": AnotherSource, "enabled": False, "url": "https://example.com/another"},
         ]
 
