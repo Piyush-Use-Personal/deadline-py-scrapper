@@ -115,12 +115,19 @@ class NyTimes(AbstractSource):
                     else None
                 )
 
-                author_element = item.find("p", class_="css-1y3ykdt e140qd2t0")
-                author = (
-                    author_element.get_text(strip=True).replace("By ", "")
-                    if author_element
-                    else None
-                )
+                p_tag_content = item.find('p', class_='css-1pga48a e15t083i1').get_text(strip=True)
+                content = []
+                # Extract and print the text if the p tag is found
+                if p_tag_content:
+                    content.append(p_tag_content)  # or p_tag.get_text()
+                   
+
+                span_tag_author = item.find('span', class_='css-1n7hynb')
+
+                # Extract and print the text if the span is found
+                if span_tag_author:
+                    author = span_tag_author.text  # Alternatively, you can use span_tag.get_text()
+                    
 
                 date = item.select_one("div > div > span").get_text(strip=True)
 
@@ -136,7 +143,7 @@ class NyTimes(AbstractSource):
                 stories.append(
                     {
                         "title": title,
-                        "content": description,
+                        "content": content,
                         "categories": [],
                         "author": author,
                         "date": date,
@@ -198,9 +205,9 @@ class NyTimes(AbstractSource):
                         if isinstance(obj.get("content"), list)
                         else []
                     ),  # Ensure content is a list
-                    "author": obj.get("author_name", ""),
-                    "urlArticle": obj.get("url", ""),
-                    "link": obj.get("url", ""),
+                    "author": obj.get("author", ""),
+                    "urlArticle": obj.get("link", ""),
+                    "link": obj.get("link", ""),
                     "urlBannerImage": obj.get("banner", ""),
                     "urlThumbnailImage": obj.get("banner", ""),
                     "publishedDate": publish_date,
