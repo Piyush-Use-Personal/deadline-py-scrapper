@@ -1,5 +1,7 @@
 from .deadline import Deadline  # Relative import within the same directory
-from .hollywoodreporter import HollywoodReporter  # Relative import within the same directory
+from .hollywoodreporter import (
+    HollywoodReporter,
+)  # Relative import within the same directory
 from .screenrant import ScreenRant  # Relative import within the same directory
 from .slashfilm import SlashFilm  # Relative import within the same directory
 from .screenDaily import ScreenDaily  # Relative import within the same directory
@@ -7,7 +9,10 @@ from .variety import Variety  # Relative import within the same directory
 from .atlantic import Atlantic  # Relative import within the same directory
 from .nyTimes import NyTimes
 from .collider import Collider
+from .indiewire import IndieWire
+
 # from some_module import AnotherSource
+
 
 class Engine:
     def __init__(self):
@@ -20,7 +25,16 @@ class Engine:
             # {"class": ScreenRant, "enabled": True, "url": "https://screenrant.com/movie-news/"},
             # {"class": SlashFilm, "enabled": True, "url": "https://www.slashfilm.com/category/movies/"},
             # {"class": Atlantic, "enabled": True, "url": "https://www.theatlantic.com/culture/"},
-            {"class": NyTimes, "enabled": True, "url": "https://www.nytimes.com/section/movies"},
+            # {
+            #     "class": NyTimes,
+            #     "enabled": True,
+            #     "url": "https://www.nytimes.com/section/movies",
+            # },
+            {
+                "class": IndieWire,
+                "enabled": True,
+                "url": "https://www.indiewire.com/c/criticism/movies/",
+            },
             # {"class": Collider, "enabled": True, "url": "https://collider.com/"},
             # {"class": ScreenDaily, "enabled": True, "url": "https://www.screendaily.com/box-office"},
             # {"class": AnotherSource, "enabled": False, "url": "https://example.com/another"},
