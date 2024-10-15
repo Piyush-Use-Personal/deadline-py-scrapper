@@ -20,9 +20,8 @@ class Engine:
             # {"class": ScreenRant, "enabled": True, "url": "https://screenrant.com/movie-news/"},
             # {"class": SlashFilm, "enabled": True, "url": "https://www.slashfilm.com/category/movies/"},
             # {"class": Atlantic, "enabled": True, "url": "https://www.theatlantic.com/culture/"},
-            # {"class": NyTimes, "enabled": True, "url": "https://www.nytimes.com/section/movies"},
-            {"class": NyTimes, "enabled": True, "url": "https://collider.com/"},
-            # {"class": Collider, "enabled": True, "url": "https://www.nytimes.com/section/business/media"},
+            {"class": NyTimes, "enabled": True, "url": "https://www.nytimes.com/section/movies"},
+            # {"class": Collider, "enabled": True, "url": "https://collider.com/"},
             # {"class": ScreenDaily, "enabled": True, "url": "https://www.screendaily.com/box-office"},
             # {"class": AnotherSource, "enabled": False, "url": "https://example.com/another"},
         ]
