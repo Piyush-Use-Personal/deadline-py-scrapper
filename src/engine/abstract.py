@@ -54,7 +54,7 @@ class AbstractSource(ABC):
 
     def parse_datetime(self, date_str: str) -> Optional[Tuple[datetime, datetime]]:
         def parse_date(date_string:str):
-            formats = ["%B %d, %Y %I:%M%p", "%b %d, %Y %I:%M%p","%b. %d, %Y %I:%M %p"]
+            formats = ["%B %d, %Y %I:%M%p", "%b %d, %Y %I:%M%p","%b. %d, %Y %I:%M %p", "%B %d, %Y @ %I:%M %p"]
             for fmt in formats:
                 try:
                     return datetime.strptime(date_string, fmt)
