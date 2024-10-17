@@ -14,6 +14,7 @@ from .laTimesMovies import LATimes
 from .theplaylist import ThePlaylist 
 from .vulture import Vulture
 from .thewrap import TheWrap
+from .theGuardian import TheGuardian
 # from some_module import AnotherSource
 
 
@@ -47,6 +48,11 @@ class Engine:
                 "class": LATimes,
                 "enabled": True,
                 "url": "https://www.latimes.com/entertainment-arts/business",
+            },
+            {
+                "class": TheGuardian,
+                "enabled": True,
+                "url": "https://www.theguardian.com/film/all",
             },
             # {"class": ThePlaylist, "enabled": True, "url": "https://theplaylist.net/"},
             # {"class": Vulture, "enabled": True, "url": "https://www.vulture.com/movies/"},
