@@ -10,11 +10,10 @@ from .atlantic import Atlantic  # Relative import within the same directory
 from .nyTimes import NyTimes
 from .collider import Collider
 from .indiewire import IndieWire
+from .laTimesMovies import LATimes
 from .theplaylist import ThePlaylist 
 from .vulture import Vulture
 from .thewrap import TheWrap
-
-
 # from some_module import AnotherSource
 
 
@@ -39,12 +38,22 @@ class Engine:
             #     "enabled": True,
             #     "url": "https://www.indiewire.com/c/criticism/movies/",
             # },
+            # {
+            #     "class": LATimes,
+            #     "enabled": True,
+            #     "url": "https://www.latimes.com/entertainment-arts/movies",
+            # },
+            {
+                "class": LATimes,
+                "enabled": True,
+                "url": "https://www.latimes.com/entertainment-arts/business",
+            },
+            # {"class": ThePlaylist, "enabled": True, "url": "https://theplaylist.net/"},
+            # {"class": Vulture, "enabled": True, "url": "https://www.vulture.com/movies/"},
+            # {"class": TheWrap, "enabled": True, "url": "https://www.thewrap.com/category/movies/"},
             # {"class": Collider, "enabled": True, "url": "https://collider.com/"},
             # {"class": ScreenDaily, "enabled": True, "url": "https://www.screendaily.com/box-office"},
             # {"class": AnotherSource, "enabled": False, "url": "https://example.com/another"},
-            # {"class": ThePlaylist, "enabled": True, "url": "https://theplaylist.net/"},
-            # {"class": Vulture, "enabled": True, "url": "https://www.vulture.com/movies/"},
-            {"class": TheWrap, "enabled": True, "url": "https://www.thewrap.com/category/movies/"},
         ]
 
     def run(self):
